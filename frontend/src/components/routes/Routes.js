@@ -13,6 +13,8 @@ import UserLogHistoryScreen from '../../screens/LogHistoryScreen'
 import ForgotPasswordScreen from '../../screens/ForgotPasswordScreen'
 import ResetPasswordScreen from '../../screens/ResetPasswordScreen'
 import OrderScreen from '../../screens/OrderScreen'
+import OrderInfoScreen from '../../screens/OrderInfoScreen'
+import PrintOrderScreen from '../../screens/PrintOrderScreen'
 
 const Routes = () => {
   return (
@@ -26,11 +28,16 @@ const Routes = () => {
         />
         <Route path='/forgotpassword' component={ForgotPasswordScreen} />
         <Route path='/login' component={LoginScreen} />
-        <Route path='/register' r component={RegisterScreen} />
+        {/* <Route path='/register'  component={RegisterScreen} /> */}
         <PrivateRoute
           role={['Admin', 'User', 'Store Keeper']}
           path='/profile'
           component={ProfileScreen}
+        />
+        <PrivateRoute
+          role={['Admin', 'User', 'Store Keeper']}
+          path='/order/:id'
+          component={PrintOrderScreen}
         />
         <Route
           path='/resetpassword/:resetToken'

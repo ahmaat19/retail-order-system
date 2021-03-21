@@ -43,10 +43,30 @@ export const updateOrderItems = asyncHandler(async (req, res) => {
   }
 })
 
+export const getOrderDetails = asyncHandler(async (req, res) => {
+  const order = await OrderModel.findById(req.params.id)
+    .populate('user', ['name'])
+    .sort({
+      createdAt: -1,
+    })
+
+  console.log('found')
+
+  if (order) {
+    res.json(order)
+  } else {
+    res.status(404)
+    throw new Error('Order not found')
+  }
+})
+
 export const getOrderById = asyncHandler(async (req, res) => {
-  const order = await OrderModel.find({ user: req.params.id }).sort({
-    createdAt: -1,
-  })
+  const order = await OrderModel.find({ user: req.params.id })
+    .populate('user', ['name'])
+    .sort({
+      createdAt: -1,
+    })
+
   if (order) {
     res.json(order)
   } else {
@@ -56,7 +76,9 @@ export const getOrderById = asyncHandler(async (req, res) => {
 })
 
 export const getOrders = asyncHandler(async (req, res) => {
-  const orders = await OrderModel.find({}).sort({ createdAt: -1 })
+  const orders = await OrderModel.find({})
+    .populate('user', ['name'])
+    .sort({ createdAt: -1 })
   res.json(orders)
 })
 

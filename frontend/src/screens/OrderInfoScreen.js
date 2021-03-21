@@ -1,13 +1,13 @@
 import React from 'react'
 import Moment from 'react-moment'
 import moment from 'moment'
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'
+import { FaCheckCircle, FaPrint, FaTimesCircle } from 'react-icons/fa'
 
 const OrderInfoScreen = ({ orders }) => {
   return orders._id ? (
     <>
       <div className='d-flex justify-content-between'>
-        <h6 className='custom-text-yellow'>ORDER ID: {orders.user}</h6>
+        <h6 className='custom-text-yellow'>ORDER ID: {orders._id}</h6>
         <h6 className='custom-text-yellow'>
           R. DATE:{' '}
           <Moment format='YYYY-MM-DD HH:mm:ss'>
@@ -21,6 +21,7 @@ const OrderInfoScreen = ({ orders }) => {
             <tr>
               <th>ITEMS</th>
               <th>QTY REQUESTED</th>
+              <th>PREVIOUS QTY</th>
               <th>QTY ISSUED</th>
               <th>STATUS</th>
             </tr>
@@ -31,6 +32,7 @@ const OrderInfoScreen = ({ orders }) => {
                 <tr key={order._id}>
                   <td>{order.item}</td>
                   <td>{order.quantityRequested}</td>
+                  <td>{order.previousQuantity}</td>
                   <td>{order.quantityIssued}</td>
                   <td>
                     {order.quantityIssued === 0 ? (

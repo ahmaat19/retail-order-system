@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { FaPlusCircle } from 'react-icons/fa'
 import OrderFormScreen from './OrderFormScreen'
 import OrderListScreen from './OrderListScreen'
@@ -7,6 +7,7 @@ import { confirmAlert } from 'react-confirm-alert'
 import { Confirm } from '../components/Confirm'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
+import Pagination from '../components/Pagination'
 import {
   getOrders as getOrdersSlice,
   addOrder as addOrderSlice,
@@ -29,6 +30,7 @@ const OrderScreen = () => {
       item: '',
       quantityIssued: 0,
       quantityRequested: '',
+      previousQuantity: 0,
       remarks: '',
       unit: '',
     },
@@ -72,6 +74,7 @@ const OrderScreen = () => {
         item: '',
         quantityIssued: 0,
         quantityRequested: '',
+        previousQuantity: 0,
         remarks: '',
         unit: '',
       },
@@ -116,7 +119,13 @@ const OrderScreen = () => {
     if (successAddOrder || successEditOrder) {
       formCleanHandler()
     }
-  }, [dispatch, successAddOrder, successEditOrder, successDeleteOrder])
+  }, [
+    dispatch,
+    successAddOrder,
+    successEditOrder,
+    successDeleteOrder,
+    userInfo._id,
+  ])
 
   const deleteHandler = (order) => {
     confirmAlert(Confirm(() => dispatch(deleteOrderSlice(order))))
@@ -139,6 +148,7 @@ const OrderScreen = () => {
         item: '',
         quantityIssued: 0,
         quantityRequested: '',
+        previousQuantity: 0,
         remarks: '',
         unit: '',
       },
@@ -169,6 +179,21 @@ const OrderScreen = () => {
         : dispatch(editOrderSlice({ inputFields, id, status }))
       : dispatch(addOrderSlice({ inputFields, status }))
   }
+
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const itemsPerPage = 20
+  const indexOfLastItem = currentPage * itemsPerPage
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage
+
+  const currentItemsOrders =
+    orders && orders.slice(indexOfFirstItem, indexOfLastItem)
+  const totalItemsOrders = orders && Math.ceil(orders.length / itemsPerPage)
+
+  const currentItemsOrderById =
+    ordersById && ordersById.slice(indexOfFirstItem, indexOfLastItem)
+  const totalItemsOrderById =
+    ordersById && Math.ceil(ordersById.length / itemsPerPage)
 
   return (
     <>
@@ -278,6 +303,14 @@ const OrderScreen = () => {
         className='fs-1 p-1 shadow rounded-pill float-end'
         style={{ cursor: 'pointer' }}
       />
+      <div className='row mb-4'>
+        <div className='col-6'>
+          <input type='date' className='form-control' />
+        </div>
+        <div className='col-6'>
+          <input type='date' className='form-control' />
+        </div>
+      </div>
 
       {loadingGetOrders ||
       loadingGetOrderById ||
@@ -286,13 +319,35 @@ const OrderScreen = () => {
       loadingEditOrder ? (
         <Loader />
       ) : (
-        <OrderListScreen
-          orders={UnlockAccess(['Admin', 'Store Keeper']) ? orders : ordersById}
-          deleteHandler={deleteHandler}
-          editHandler={editHandler}
-          infoHandler={infoHandler}
-          userInfo={userInfo}
-        />
+        <>
+          <OrderListScreen
+            orders={
+              UnlockAccess(['Admin', 'Store Keeper'])
+                ? currentItemsOrders
+                : currentItemsOrderById
+            }
+            deleteHandler={deleteHandler}
+            editHandler={editHandler}
+            infoHandler={infoHandler}
+            userInfo={userInfo}
+          />
+          <div className='d-flex justify-content-center'>
+            <Pagination
+              setCurrentPage={setCurrentPage}
+              totalItems={
+                UnlockAccess(['Admin', 'Store Keeper'])
+                  ? totalItemsOrders
+                  : totalItemsOrderById
+              }
+              arrayLength={
+                UnlockAccess(['Admin', 'Store Keeper'])
+                  ? orders && orders.length
+                  : ordersById && ordersById.length
+              }
+              itemsPerPage={itemsPerPage}
+            />
+          </div>
+        </>
       )}
     </>
   )

@@ -26,7 +26,11 @@ const orderScheme = mongoose.Schema(
           required: true,
           default: 0,
         },
-
+        previousQuantity: {
+          type: Number,
+          required: true,
+          default: 0,
+        },
         remarks: {
           type: String,
         },

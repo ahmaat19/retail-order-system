@@ -3,6 +3,7 @@ import {
   addOrderItems,
   deleteOrder,
   getOrderById,
+  getOrderDetails,
   getOrders,
   updateOrderItems,
 } from '../controllers/orderController.js'
@@ -16,5 +17,7 @@ router
   .get(protect, getOrderById)
   .delete(protect, deleteOrder)
   .put(protect, updateOrderItems)
+
+router.route('/details/:id').get(protect, getOrderDetails)
 
 export default router

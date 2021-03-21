@@ -17,6 +17,7 @@ import {
   editOrderSliceReducer,
   getOrdersSliceReducer,
   getOrderByIdSliceReducer,
+  getOrderDetailsSliceReducer,
 } from './orders/orderSlice'
 
 export default configureStore({
@@ -37,5 +38,6 @@ export default configureStore({
     editOrder: editOrderSliceReducer,
     getOrders: getOrdersSliceReducer,
     getOrderById: getOrderByIdSliceReducer,
+    getOrderDetails: getOrderDetailsSliceReducer,
   },
 })

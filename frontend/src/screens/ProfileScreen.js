@@ -64,6 +64,7 @@ const ProfileScreen = () => {
             onChange={(e) => setName(e.target.value)}
             autoFocus
             required
+            disabled
           />
         </div>
         <div className='form-group'>

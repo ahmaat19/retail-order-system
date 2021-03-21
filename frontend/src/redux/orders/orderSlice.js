@@ -6,6 +6,7 @@ import {
   editOrder,
   deleteOrder,
   getOrderById,
+  getOrderDetails,
 } from './orderThunks'
 
 // get all orders
@@ -143,14 +144,43 @@ const getOrderByIdSlice = createSlice({
   },
 })
 
+// get order details
+const getOrderDetailsSlice = createSlice({
+  name: 'getOrderDetails',
+  initialState: {},
+  reducers: {
+    resetGetOrderDetailsState: (state) => {
+      state.loadingGetOrder = false
+      state.successGetOrder = false
+      state.errorGetOrder = null
+    },
+  },
+  extraReducers: {
+    [getOrderDetails.pending]: (state) => {
+      state.loadingGetOrderDetails = true
+    },
+    [getOrderDetails.fulfilled]: (state, { payload }) => {
+      state.loadingGetOrderDetails = false
+      state.successGetOrderDetails = true
+      state.order = payload
+    },
+    [getOrderDetails.rejected]: (state, { error }) => {
+      state.loadingGetOrderDetails = false
+      state.errorOrders = error.message
+    },
+  },
+})
+
 export const deleteOrderSliceReducer = deleteOrderSlice.reducer
 export const editOrderSliceReducer = editOrderSlice.reducer
 export const addOrderSliceReducer = addOrderSlice.reducer
 export const getOrdersSliceReducer = getOrdersSlice.reducer
 export const getOrderByIdSliceReducer = getOrderByIdSlice.reducer
+export const getOrderDetailsSliceReducer = getOrderDetailsSlice.reducer
 
 export const { resetEditOrderState } = editOrderSlice.actions
 export const { resetAddOrderState } = addOrderSlice.actions
 export const { resetGetOrderState } = getOrdersSlice.actions
 export const { resetDeleteOrderState } = deleteOrderSlice.actions
 export const { resetGetOrderByIdState } = getOrderByIdSlice.actions
+export const { resetGetOrderDetailsState } = getOrderDetailsSlice.actions

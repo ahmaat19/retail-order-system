@@ -84,3 +84,17 @@ export const getOrderById = createAsyncThunk(
     }
   }
 )
+
+// get order details
+export const getOrderDetails = createAsyncThunk(
+  'getOrderDetails',
+  async (id, { getState }) => {
+    const config = configHeader(getState)
+    try {
+      const { data } = await axios.get(`/api/orders/details/${id}`, config)
+      return data
+    } catch (error) {
+      throw error.response.data
+    }
+  }
+)

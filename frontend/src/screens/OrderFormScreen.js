@@ -14,51 +14,93 @@ const OrderFormScreen = ({
   return (
     <form onSubmit={handleSubmit}>
       {inputFields.map((inputField, index) => (
-        <div key={index} className='row g-0'>
-          <div className='col-sm-10 col-12'>
-            <div className='row g-0'>
-              <div
-                className={`${
-                  UnlockAccess(['Admin', 'Store Keeper']) ? 'col-3' : 'col-5'
-                }`}
-              >
+        <div key={index}>
+          <div className='row '>
+            <div
+              className={`${
+                UnlockAccess(['Admin', 'Store Keeper']) ? 'col-4' : 'col-5'
+              }`}
+            >
+              <div className='mb-3'>
+                <label htmlFor='item' className='form-label'>
+                  Item
+                </label>
                 <input
                   autoFocus
                   type='text'
                   className='form-control border border-success shadow-none '
                   placeholder='Item'
                   name='item'
+                  id='item'
                   value={inputField.item}
                   required
                   onChange={(e) => handleInputChange(e, index)}
                 />
               </div>
-              <div className='col-2'>
-                <input
-                  type='text'
-                  className='form-control border border-success shadow-none '
-                  placeholder='Unit'
-                  name='unit'
-                  value={inputField.unit}
-                  required
-                  onChange={(e) => handleInputChange(e, index)}
-                />
-              </div>
-              <div className='col-2'>
+            </div>
+
+            <div className='col-2'>
+              <div className='mb-3'>
+                <label htmlFor='quantityRequested' className='form-label'>
+                  Requested QTY
+                </label>
                 <input
                   type='number'
                   min='0'
+                  max={inputField.quantityRequested}
                   className='form-control border border-success shadow-none '
-                  placeholder='Qty'
+                  placeholder='Requested'
                   name='quantityRequested'
+                  id='quantityRequested'
                   value={inputField.quantityRequested}
                   required
                   onChange={(e) => handleInputChange(e, index)}
                 />
               </div>
+            </div>
 
-              {UnlockAccess(['Admin', 'Store Keeper']) && (
-                <div className='col-2'>
+            <div className='col-2'>
+              <div className='mb-3'>
+                <label htmlFor='unit' className='form-label'>
+                  Unit
+                </label>
+                <input
+                  type='text'
+                  className='form-control border border-success shadow-none '
+                  placeholder='Unit'
+                  name='unit'
+                  id='unit'
+                  value={inputField.unit}
+                  required
+                  onChange={(e) => handleInputChange(e, index)}
+                />
+              </div>
+            </div>
+
+            <div className='col-2'>
+              <div className='mb-3'>
+                <label htmlFor='previousQuantity' className='form-label'>
+                  Previous QTY
+                </label>
+                <input
+                  type='number'
+                  min='0'
+                  className='form-control border border-success shadow-none '
+                  placeholder='Previous Qty'
+                  name='previousQuantity'
+                  id='previousQuantity'
+                  value={inputField.previousQuantity}
+                  required
+                  onChange={(e) => handleInputChange(e, index)}
+                />
+              </div>
+            </div>
+            {UnlockAccess(['Admin', 'Store Keeper']) && (
+              <div className='col-2'>
+                <div className='mb-3'>
+                  <label htmlFor='quantityIssued' className='form-label'>
+                    Issued QTY
+                  </label>
                   <input
                     type='number'
                     min='0'
@@ -66,49 +108,58 @@ const OrderFormScreen = ({
                     className='form-control border border-success shadow-none '
                     placeholder='Issued'
                     name='quantityIssued'
+                    id='quantityIssued'
                     value={inputField.quantityIssued}
                     required
                     onChange={(e) => handleInputChange(e, index)}
                   />
                 </div>
-              )}
-              <div className='col-3'>
+              </div>
+            )}
+            <div className='col-9'>
+              <div className='mb-3'>
+                <label htmlFor='remarks' className='form-label'>
+                  Remarks
+                </label>
                 <input
                   type='text'
                   className='form-control border border-success shadow-none '
                   placeholder='Remarks'
                   name='remarks'
+                  id='remarks'
                   value={inputField.remarks}
-                  required
                   onChange={(e) => handleInputChange(e, index)}
                 />
               </div>
             </div>
-          </div>
+            <div className='col-3'>
+              <div className='mb-3'>
+                <label className='form-label'>Actions</label> <br />
+                <div className='btn-group'>
+                  {inputFields.length > 1 && (
+                    <button
+                      onClick={() => handleRemoveField(index)}
+                      type='button'
+                      className='btn btn-danger custom-bg-dark'
+                    >
+                      <FaTimesCircle className='text-danger mb-1' /> REMOVE
+                    </button>
+                  )}
 
-          <div className='col-sm-2 col-12'>
-            <div className='btn-group p-0 m-0'>
-              {inputFields.length > 1 && (
-                <button
-                  onClick={() => handleRemoveField(index)}
-                  type='button'
-                  className='btn btn-danger custom-bg-dark'
-                >
-                  <FaTimesCircle className='text-danger' />
-                </button>
-              )}
-
-              {inputFields.length - 1 === index && (
-                <button
-                  onClick={() => handleAddField()}
-                  type='button'
-                  className='btn btn-primary custom-bg-dark'
-                >
-                  <FaPlusCircle />
-                </button>
-              )}
+                  {inputFields.length - 1 === index && (
+                    <button
+                      onClick={() => handleAddField()}
+                      type='button'
+                      className='btn btn-primary custom-bg-dark'
+                    >
+                      <FaPlusCircle className='mb-1' /> ADD
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
+          <hr />
         </div>
       ))}
 
