@@ -8,6 +8,7 @@ import { Confirm } from '../components/Confirm'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import Pagination from '../components/Pagination'
+import moment from 'moment'
 import {
   getOrders as getOrdersSlice,
   addOrder as addOrderSlice,
@@ -40,6 +41,13 @@ const OrderScreen = () => {
   const [edit, setEdit] = useState(false)
   const [id, setId] = useState(null)
   const [status, setStatus] = useState('Pending')
+
+  const [department, setDepartment] = useState('')
+  const [from, setFrom] = useState(moment(Date.now()).format('YYYY-MM-DD'))
+  const date = new Date()
+  const [to, setTo] = useState(
+    moment(date.setDate(date.getDate() + 1)).format('YYYY-MM-DD')
+  )
 
   const dispatch = useDispatch()
   const getOrders = useSelector((state) => state.getOrders)
@@ -81,6 +89,8 @@ const OrderScreen = () => {
     ])
     setEdit(false)
   }
+
+  // console.log(moment(Date.now()).format('YYYY-MM-DD'))
 
   useEffect(() => {
     if (
@@ -186,14 +196,36 @@ const OrderScreen = () => {
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
 
+  const totalFilteredOrders =
+    orders &&
+    orders.filter(
+      (ord) =>
+        ord.createdAt >= from &&
+        ord.createdAt <= to &&
+        ord.user.name.toLowerCase().includes(department.toLowerCase())
+    )
+
+  const totalFilteredOrderById =
+    ordersById &&
+    ordersById.filter(
+      (ord) =>
+        ord.createdAt >= from &&
+        ord.createdAt <= to &&
+        ord.user.name.toLowerCase().includes(department.toLowerCase())
+    )
+
   const currentItemsOrders =
-    orders && orders.slice(indexOfFirstItem, indexOfLastItem)
-  const totalItemsOrders = orders && Math.ceil(orders.length / itemsPerPage)
+    totalFilteredOrders &&
+    totalFilteredOrders.slice(indexOfFirstItem, indexOfLastItem)
+  const totalItemsOrders =
+    totalFilteredOrders && Math.ceil(totalFilteredOrders.length / itemsPerPage)
 
   const currentItemsOrderById =
-    ordersById && ordersById.slice(indexOfFirstItem, indexOfLastItem)
+    totalFilteredOrderById &&
+    totalFilteredOrderById.slice(indexOfFirstItem, indexOfLastItem)
   const totalItemsOrderById =
-    ordersById && Math.ceil(ordersById.length / itemsPerPage)
+    totalFilteredOrderById &&
+    Math.ceil(totalFilteredOrderById.length / itemsPerPage)
 
   return (
     <>
@@ -304,11 +336,33 @@ const OrderScreen = () => {
         style={{ cursor: 'pointer' }}
       />
       <div className='row mb-4'>
-        <div className='col-6'>
-          <input type='date' className='form-control' />
+        <div className='col-4'>
+          <input
+            type='text'
+            className='form-control'
+            placeholder='Enter department'
+            onChange={(e) => setDepartment(e.target.value)}
+            name='department'
+            value={department}
+          />
         </div>
-        <div className='col-6'>
-          <input type='date' className='form-control' />
+        <div className='col-4'>
+          <input
+            onChange={(e) => setFrom(e.target.value)}
+            name='from'
+            value={from}
+            type='date'
+            className='form-control'
+          />
+        </div>
+        <div className='col-4'>
+          <input
+            onChange={(e) => setTo(e.target.value)}
+            name='to'
+            value={to}
+            type='date'
+            className='form-control'
+          />
         </div>
       </div>
 
