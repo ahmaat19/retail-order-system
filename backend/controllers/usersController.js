@@ -18,10 +18,34 @@ const logSession = asyncHandler(async (id) => {
 })
 
 export const logHistory = asyncHandler(async (req, res) => {
-  const log = await LogonSession.find({})
+  let query = LogonSession.find()
+
+  const page = parseInt(req.query.page) || 1
+  const pageSize = parseInt(req.query.limit) || 30
+  const skip = (page - 1) * pageSize
+  const total = await LogonSession.countDocuments()
+
+  const pages = Math.ceil(total / pageSize)
+
+  query = query
+    .skip(skip)
+    .limit(pageSize)
     .sort({ logDate: -1 })
     .populate('user', ['name', 'email'])
-  res.json(log)
+
+  if (page > pages) {
+    res.status(404)
+    throw new Error('Page not found')
+  }
+  const result = await query
+
+  res.status(200).json({
+    count: result.length,
+    page,
+    pages,
+    total,
+    data: result,
+  })
 })
 
 export const authUser = asyncHandler(async (req, res) => {
@@ -56,7 +80,6 @@ export const registerUser = asyncHandler(async (req, res) => {
   const userRoles = []
   roles.admin && userRoles.push('Admin')
   roles.user && userRoles.push('User')
-  roles.storeKeeper && userRoles.push('Store Keeper')
 
   const user = await User.create({
     name,
@@ -120,9 +143,34 @@ export const updateUserProfile = asyncHandler(async (req, res) => {
 })
 
 export const getUsers = asyncHandler(async (req, res) => {
-  const users = await User.find({}).sort({ createdAt: -1 })
+  let query = User.find()
 
-  res.json(users)
+  const page = parseInt(req.query.page) || 1
+  const pageSize = parseInt(req.query.limit) || 30
+  const skip = (page - 1) * pageSize
+  const total = await User.countDocuments()
+
+  const pages = Math.ceil(total / pageSize)
+
+  query = query
+    .skip(skip)
+    .limit(pageSize)
+    .sort({ createdAt: -1 })
+    .populate('user', ['name', 'email'])
+
+  if (page > pages) {
+    res.status(404)
+    throw new Error('Page not found')
+  }
+  const result = await query
+
+  res.status(200).json({
+    count: result.length,
+    page,
+    pages,
+    total,
+    data: result,
+  })
 })
 
 export const deleteUser = asyncHandler(async (req, res) => {
@@ -156,8 +204,6 @@ export const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id)
   const roles = req.body.roles
 
-  console.log(roles)
-
   if (req.params.id == req.user._id) {
     res.status(400)
     throw new Error("You can't edit your own user in the admin area.")
@@ -166,7 +212,6 @@ export const updateUser = asyncHandler(async (req, res) => {
   const userRoles = []
   roles.admin && userRoles.push('Admin')
   roles.user && userRoles.push('User')
-  roles.storeKeeper && userRoles.push('Store Keeper')
 
   if (user) {
     user.name = req.body.name || user.name

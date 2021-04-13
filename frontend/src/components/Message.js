@@ -18,7 +18,7 @@ const Message = ({ variant, children }) => {
     alert && (
       <div
         className='position-fixed top-0 end-0 p-2 animate__animated animate__lightSpeedInRight '
-        style={{ zIndex: 10000 }}
+        style={{ zIndex: 5 }}
       >
         <div
           className={`toast show text-${variant}`}

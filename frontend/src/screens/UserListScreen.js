@@ -11,20 +11,22 @@ import {
 } from 'react-icons/fa'
 
 import {
-  listUsers,
+  resetDeleteUser,
+  resetListUsers,
+  resetUpdateUser,
+} from '../redux/users/usersSlice'
+import {
   deleteUser,
+  listUsers,
   updateUser,
   registerUser,
-  alertDeleteUserReset,
-  alertListUserReset,
-  alertUpdateUserReset,
-} from '../redux/users/usersSlice'
+} from '../redux/users/usersThunk'
 
-import Pagination from '../components/Pagination'
 import { UnlockAccess } from '../components/UnlockAccess'
 
 import { confirmAlert } from 'react-confirm-alert'
 import { Confirm } from '../components/Confirm'
+import Pagination from '../components/Pagination'
 
 const UserListScreen = () => {
   const [id, setId] = useState(null)
@@ -34,23 +36,29 @@ const UserListScreen = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [adminRole, setAdminRole] = useState(false)
   const [userRole, setUserRole] = useState(false)
-  const [storeKeeperRole, setStoreKeeper] = useState(false)
   const [message, setMessage] = useState('')
   const [edit, setEdit] = useState(false)
+
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(30)
 
   const dispatch = useDispatch()
 
   const userList = useSelector((state) => state.userList)
-  const { users, loadingUsers, errorUsers } = userList
+  const { users, loadingListUsers, errorListUsers, total, pages } = userList
 
   const userUpdate = useSelector((state) => state.userUpdate)
-  const { loadingUpdate, errorUpdate, successUpdate } = userUpdate
+  const { loadingUpdateUser, errorUpdateUser, successUpdateUser } = userUpdate
 
   const userDelete = useSelector((state) => state.userDelete)
-  const { successDelete, errorDelete } = userDelete
+  const { successDeleteUser, errorDeleteUser } = userDelete
 
   const userRegister = useSelector((state) => state.userRegister)
-  const { loadingRegister, errorRegister, successRegister } = userRegister
+  const {
+    loadingRegisterUser,
+    errorRegisterUser,
+    successRegisterUser,
+  } = userRegister
 
   const formCleanHandler = () => {
     setName('')
@@ -58,55 +66,56 @@ const UserListScreen = () => {
     setPassword('')
     setAdminRole(false)
     setUserRole(false)
-    setStoreKeeper(false)
     setConfirmPassword('')
     setEdit(false)
   }
 
   useEffect(() => {
     if (
-      errorDelete ||
-      errorRegister ||
-      errorUsers ||
-      errorUpdate ||
-      successDelete ||
-      successRegister ||
-      successUpdate
+      errorDeleteUser ||
+      errorRegisterUser ||
+      errorListUsers ||
+      errorUpdateUser ||
+      successDeleteUser ||
+      successRegisterUser ||
+      successUpdateUser
     ) {
       setTimeout(() => {
-        dispatch(alertDeleteUserReset())
-        dispatch(alertListUserReset())
-        dispatch(alertUpdateUserReset())
-        dispatch(alertListUserReset())
+        dispatch(resetDeleteUser())
+        dispatch(resetListUsers())
+        dispatch(resetUpdateUser())
       }, 5000)
     }
   }, [
-    errorDelete,
-    errorRegister,
-    errorUsers,
-    errorUpdate,
-    successDelete,
-    successRegister,
-    successUpdate,
+    errorDeleteUser,
+    errorRegisterUser,
+    errorListUsers,
+    errorUpdateUser,
+    successDeleteUser,
+    successRegisterUser,
+    successUpdateUser,
     dispatch,
   ])
 
   useEffect(() => {
-    dispatch(listUsers())
-    if (successUpdate || successRegister) {
+    dispatch(listUsers({ page, limit }))
+    if (successUpdateUser || successRegisterUser) {
       formCleanHandler()
     }
-  }, [dispatch, successDelete, successUpdate, successRegister])
+  }, [
+    dispatch,
+    successDeleteUser,
+    successUpdateUser,
+    successRegisterUser,
+    page,
+    limit,
+  ])
 
   const deleteHandler = (id) => {
     confirmAlert(Confirm(() => dispatch(deleteUser(id))))
   }
 
-  const roles = {
-    admin: adminRole,
-    user: userRole,
-    storeKeeper: storeKeeperRole,
-  }
+  const roles = { admin: adminRole, user: userRole }
 
   const submitHandler = (e) => {
     e.preventDefault()
@@ -131,18 +140,9 @@ const UserListScreen = () => {
       user.roles.map(
         (role) =>
           (role === 'Admin' && setAdminRole(true)) ||
-          (role === 'User' && setUserRole(true)) ||
-          (role === 'Store Keeper' && setStoreKeeper(true))
+          (role === 'User' && setUserRole(true))
       )
   }
-
-  const [currentPage, setCurrentPage] = useState(1)
-
-  const itemsPerPage = 5
-  const indexOfLastItem = currentPage * itemsPerPage
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentItems = users && users.slice(indexOfFirstItem, indexOfLastItem)
-  const totalItems = users && Math.ceil(users.length / itemsPerPage)
 
   return (
     <>
@@ -158,10 +158,7 @@ const UserListScreen = () => {
         <div className='modal-dialog'>
           <div className='modal-content modal-background'>
             <div className='modal-header'>
-              <h3
-                className='modal-title custom-text-yellow'
-                id='editUserModalLabel'
-              >
+              <h3 className='modal-title ' id='editUserModalLabel'>
                 {edit ? 'Edit User' : 'Add User'}
               </h3>
               <button
@@ -174,27 +171,29 @@ const UserListScreen = () => {
             </div>
             <div className='modal-body'>
               {message && <Message variant='danger'>{message}</Message>}
-              {successUpdate && (
+              {successUpdateUser && (
                 <Message variant='success'>
                   User has been updated successfully.
                 </Message>
               )}
-              {errorUpdate && <Message variant='danger'>{errorUpdate}</Message>}
-              {loadingUpdate && <Loader />}
-              {successRegister && (
+              {errorUpdateUser && (
+                <Message variant='danger'>{errorUpdateUser}</Message>
+              )}
+              {loadingUpdateUser && <Loader />}
+              {successRegisterUser && (
                 <Message variant='success'>
                   User has been Created successfully.
                 </Message>
               )}
-              {errorRegister && (
-                <Message variant='danger'>{errorRegister}</Message>
+              {errorRegisterUser && (
+                <Message variant='danger'>{errorRegisterUser}</Message>
               )}
-              {loadingRegister && <Loader />}
+              {loadingRegisterUser && <Loader />}
 
-              {loadingUsers ? (
+              {loadingListUsers ? (
                 <Loader />
-              ) : errorUsers ? (
-                <Message variant='danger'>{errorUsers}</Message>
+              ) : errorListUsers ? (
+                <Message variant='danger'>{errorListUsers}</Message>
               ) : (
                 <form onSubmit={submitHandler}>
                   <div className='form-group'>
@@ -262,25 +261,6 @@ const UserListScreen = () => {
                         <input
                           className='form-check-input'
                           type='checkbox'
-                          value='Store Keeper'
-                          id='storeKeeper'
-                          name='storeKeeper'
-                          checked={storeKeeperRole}
-                          onChange={(e) => setStoreKeeper(e.target.checked)}
-                        />
-                        <label
-                          className='form-check-label'
-                          htmlFor='storeKeeper'
-                        >
-                          Store Keeper
-                        </label>
-                      </div>
-                    </div>
-                    <div className='col'>
-                      <div className='form-check'>
-                        <input
-                          className='form-check-input'
-                          type='checkbox'
                           value='User'
                           id='user'
                           name='user'
@@ -315,7 +295,7 @@ const UserListScreen = () => {
       </div>
 
       <div className='d-flex justify-content-between align-items-center'>
-        <h3 className='custom-text-yellow'>Users</h3>
+        <h3 className=''>Users</h3>
         <button
           className='btn btn-light btn-sm'
           data-bs-toggle='modal'
@@ -325,19 +305,29 @@ const UserListScreen = () => {
         </button>
       </div>
 
-      {successDelete && (
+      {successDeleteUser && (
         <Message variant='success'>User has been deleted successfully.</Message>
       )}
-      {errorDelete && <Message variant='danger'>{errorDelete}</Message>}
-      {loadingUsers ? (
+      {errorDeleteUser && <Message variant='danger'>{errorDeleteUser}</Message>}
+      {loadingListUsers ? (
         <Loader />
-      ) : errorUsers ? (
-        <Message variant='danger'>{errorUsers}</Message>
+      ) : errorListUsers ? (
+        <Message variant='danger'>{errorListUsers}</Message>
       ) : (
         <>
+          <div className='d-flex justify-content-center mt-2'>
+            <Pagination
+              setPage={setPage}
+              page={page}
+              pages={pages}
+              limit={limit}
+              setLimit={setLimit}
+              total={total}
+            />
+          </div>
           <div className='table-responsive '>
             <table className='table table-sm hover bordered striped caption-top custom-text-yellow'>
-              <caption>{users && users.length} records were found</caption>
+              <caption>{total} records were found</caption>
               <thead>
                 <tr>
                   <th>ID</th>
@@ -348,8 +338,8 @@ const UserListScreen = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentItems &&
-                  currentItems.map((user) => (
+                {users &&
+                  users.map((user) => (
                     <tr key={user._id}>
                       <td>{user._id}</td>
                       <td>{user.name}</td>
@@ -387,10 +377,12 @@ const UserListScreen = () => {
           </div>
           <div className='d-flex justify-content-center'>
             <Pagination
-              setCurrentPage={setCurrentPage}
-              totalItems={totalItems}
-              arrayLength={users && users.length}
-              itemsPerPage={itemsPerPage}
+              setPage={setPage}
+              page={page}
+              pages={pages}
+              limit={limit}
+              setLimit={setLimit}
+              total={total}
             />
           </div>
         </>

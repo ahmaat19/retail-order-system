@@ -64,16 +64,18 @@ const OrderFormScreen = ({
                 <label htmlFor='unit' className='form-label'>
                   Unit
                 </label>
-                <input
-                  type='text'
-                  className='form-control border border-success shadow-none '
-                  placeholder='Unit'
+                <select
                   name='unit'
+                  className='form-control border border-success shadow-none '
                   id='unit'
                   value={inputField.unit}
                   required
                   onChange={(e) => handleInputChange(e, index)}
-                />
+                >
+                  <option value=''>-----</option>
+                  <option value='box'>box</option>
+                  <option value='pcs'>pcs</option>
+                </select>
               </div>
             </div>
 

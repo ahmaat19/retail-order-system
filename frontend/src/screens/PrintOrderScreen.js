@@ -76,6 +76,7 @@ const PrintOrderScreen = ({ match }) => {
               <tr>
                 <th>ITEM</th>
                 <th>REQUESTED QTY</th>
+                <th>UNIT</th>
                 <th>PREVIOUS QTY</th>
                 <th>ISSUED QTY</th>
                 <th>REMAINING QTY</th>
@@ -88,6 +89,7 @@ const PrintOrderScreen = ({ match }) => {
                 <tr key={ord._id}>
                   <td>{ord.item}</td>
                   <td>{ord.quantityRequested}</td>
+                  <td>{ord.unit}</td>
                   <td>{ord.previousQuantity}</td>
                   <td>{ord.quantityIssued}</td>
                   <td>{ord.quantityRequested - ord.quantityIssued}</td>

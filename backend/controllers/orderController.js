@@ -2,6 +2,7 @@ import asyncHandler from 'express-async-handler'
 import OrderModel from '../models/orderModel.js'
 
 export const addOrderItems = asyncHandler(async (req, res) => {
+  console.log('Requested')
   const orderItems = req.body.inputFields
 
   if (orderItems && orderItems.length === 0) {
